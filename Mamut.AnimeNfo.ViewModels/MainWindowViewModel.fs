@@ -17,14 +17,14 @@ type MainWindowViewModel() =
             base.RaisePropertyChanged("Text")
 
     member private this.onClick() =
-        async {
+        async{
             let! links =  yearLinks 
-            let sb = links |> Seq.fold (fun (acc : StringBuilder) s -> acc.AppendLine(s)) (new StringBuilder())
+            let! urls = animeByYearUrls ("http://www.animenfo.com/" + Seq.head links)
+            let sb = urls |> Seq.fold (fun (acc : StringBuilder) s -> acc.AppendLine(s)) (new StringBuilder())
 
             this.Text <- sb.ToString()}
                 |> Async.RunSynchronously
-                |> ignore
 
-    member x.ClickCommand with get() = new DelegateCommand(fun () -> x.onClick())
+    member x.ClickCommand with get() = new DelegateCommand(fun () ->  x.onClick())
 
     
