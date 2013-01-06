@@ -18,12 +18,12 @@ type MainWindowViewModel() =
 
     member private this.onClick() =
         async{
-            let! links =  yearLinks 
-            let! urls = animeByYearUrls ("http://www.animenfo.com/" + Seq.head links)
+            let! links =  yearUrls 
+            let! urls = animeByYearUrls (links |> Seq.skip 1 |> Seq.head)
             let sb = urls |> Seq.fold (fun (acc : StringBuilder) s -> acc.AppendLine(s)) (new StringBuilder())
 
             this.Text <- sb.ToString()}
-                |> Async.RunSynchronously
+        |> Async.RunSynchronously
 
     member x.ClickCommand with get() = new DelegateCommand(fun () ->  x.onClick())
 
