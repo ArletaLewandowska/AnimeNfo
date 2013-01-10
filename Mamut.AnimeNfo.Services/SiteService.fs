@@ -24,16 +24,19 @@ let yearUrls = async {
     }
 
 let rec animeByYearUrls yearUrl = async {
-    let! page = asyncGetHtml yearUrl 
-    let urls = urlsFromPage page
-    let nextUrlQuery = nextUrl page
+    let! page = asyncGetHtml yearUrl
+    try
+        let urls = urlsFromPage page
+        let nextUrlQuery = nextUrl page
 
-    return 
         match nextUrlQuery with
-        | None  -> urls
-        | Some uq ->
-            async{
-            let! a = animeByYearUrls uq
-            return Seq.append urls a}
-            |> Async.RunSynchronously
+            | None  -> return urls
+            | Some uq ->
+                let! a = animeByYearUrls uq
+                return Seq.append urls a
+    with
+        | ex ->
+            printfn "%s" (ex.ToString())
+            return Seq.empty
+    
     }

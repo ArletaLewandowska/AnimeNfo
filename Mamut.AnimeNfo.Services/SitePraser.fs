@@ -2,6 +2,7 @@
 
 open System.Xml.Linq
 open System.Linq
+open System.Text.RegularExpressions
 
     module private Internal =
 
@@ -64,7 +65,11 @@ open System.Linq
             && actionAttribute <> null
             && actionAttribute.Value = "/animebyyear.php"
 
-        let normalizePage (page : string) = page.Replace("&nbsp;", " ").Replace("&copy;", " ")
+        let regex = new Regex("(>[^<]*)&([^<]*<)")
+
+        let normalizePage (page : string) =
+            let simple = page.Replace("&nbsp;", " ").Replace("&copy;", " ")
+            regex.Replace(simple, fun (m : Match)-> (m.Groups.[1].Value + "&amp;" + m.Groups.[2].Value))
 
 open Internal
 

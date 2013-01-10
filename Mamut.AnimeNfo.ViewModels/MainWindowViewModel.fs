@@ -19,7 +19,8 @@ type MainWindowViewModel() =
     member private this.onClick() =
         async{
             let! links =  yearUrls 
-            let! urls = animeByYearUrls (links |> Seq.skip 1 |> Seq.head)
+            let! urlGroups = Async.Parallel [for link in links -> animeByYearUrls link]
+            let urls = urlGroups |> Seq.concat
             let sb = urls |> Seq.fold (fun (acc : StringBuilder) s -> acc.AppendLine(s)) (new StringBuilder())
 
             this.Text <- sb.ToString()}
