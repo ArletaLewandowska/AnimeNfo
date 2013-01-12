@@ -9,22 +9,23 @@ open Mamut.AnimeNfo.Services.SiteService
 type MainWindowViewModel() = 
     inherit NotificationObject()
 
-    let mutable text = ""
-    member this.Text
-        with get() = text
+    let mutable animes = Seq.empty
+
+    member this.Animes
+        with get() = animes
         and set(value) =
-            text <- value
-            base.RaisePropertyChanged("Text")
+            animes <- value
+            base.RaisePropertyChanged("Animes")
+
 
     member private this.onClick() =
         async{
             let! links =  yearUrls 
             let! urlGroups = Async.Parallel [for link in links -> animeByYearUrls link]
             let urls = urlGroups |> Seq.concat
-            let sb = urls |> Seq.fold (fun (acc : StringBuilder) s -> acc.AppendLine(s)) (new StringBuilder())
 
-            this.Text <- sb.ToString()}
-        |> Async.RunSynchronously
+            this.Animes <- urls}
+            |> Async.RunSynchronously
 
     member x.ClickCommand with get() = new DelegateCommand(fun () ->  x.onClick())
 
