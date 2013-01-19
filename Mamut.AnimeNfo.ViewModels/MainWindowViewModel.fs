@@ -25,8 +25,7 @@ type MainWindowViewModel() =
             let urls = urlGroups |> Seq.concat
 
             this.Animes <- urls}
-            |> Async.RunSynchronously
 
-    member x.ClickCommand with get() = new DelegateCommand(fun () ->  x.onClick())
+    member x.ClickCommand with get() = new DelegateCommand(fun () ->  x.onClick() |> Async.StartImmediate)
 
     
