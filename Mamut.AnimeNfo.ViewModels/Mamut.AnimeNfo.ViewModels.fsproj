@@ -69,6 +69,11 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <ProjectReference Include="..\Mamut.AnimeNfo.Contract\Mamut.AnimeNfo.Contract.fsproj">
+      <Name>Mamut.AnimeNfo.Contract</Name>
+      <Project>{777c5ade-5093-496d-a27b-6bcdde3332b4}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\Mamut.AnimeNfo.Services\Mamut.AnimeNfo.Services.fsproj">
       <Name>Mamut.AnimeNfo.Services</Name>
       <Project>{2d45cbae-ecf4-4d92-9b23-29e73a27b0c2}</Project>

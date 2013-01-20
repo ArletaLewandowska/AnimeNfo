@@ -23,8 +23,9 @@ type MainWindowViewModel() =
             let! links =  yearUrls 
             let! urlGroups = Async.Parallel [for link in links -> animeByYearUrls link]
             let urls = urlGroups |> Seq.concat
+            let! animes = Async.Parallel [for link in urls -> anime link]
 
-            this.Animes <- urls}
+            this.Animes <- animes}
 
     member x.ClickCommand with get() = new DelegateCommand(fun () ->  x.onClick() |> Async.StartImmediate)
 

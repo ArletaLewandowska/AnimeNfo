@@ -9,7 +9,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ListBox ItemsSource="{Binding Animes}">
-            
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Title}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
         </ListBox>
             
         <Button Height="20" Grid.Row="1" Content="Click me!" Command="{Binding ClickCommand}"/>

@@ -40,3 +40,8 @@ let rec animeByYearUrls yearUrl = async {
             return Seq.empty
     
     }
+
+let anime animeUrl = async {
+    let! animePage = asyncGetHtml animeUrl
+    return animeFromPage animePage
+    }
