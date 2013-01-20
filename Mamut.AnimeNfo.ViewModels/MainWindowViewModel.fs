@@ -5,11 +5,13 @@ open Microsoft.Practices.Prism.Commands
 open System.Xml.Linq
 open System.Text
 open Mamut.AnimeNfo.Services.SiteService
+open System.Collections.ObjectModel
+open Mamut.AnimeNfo.Contract
 
 type MainWindowViewModel() = 
     inherit NotificationObject()
 
-    let mutable animes = Seq.empty
+    let mutable animes = new ObservableCollection<Anime>()
 
     member this.Animes
         with get() = animes
@@ -17,15 +19,14 @@ type MainWindowViewModel() =
             animes <- value
             base.RaisePropertyChanged("Animes")
 
-
-    member private this.onClick() =
-        async{
-            let! links =  yearUrls 
-            let! urlGroups = Async.Parallel [for link in links -> animeByYearUrls link]
-            let urls = urlGroups |> Seq.concat
-            let! animes = Async.Parallel [for link in urls -> anime link]
-
-            this.Animes <- animes}
+    member private this.onClick() = async {
+        let! links =  yearUrls 
+        let! urlGroups = Async.Parallel [for link in links -> animeByYearUrls link]
+        let urls = urlGroups |> Seq.concat
+        for link in urls do
+            let! anime = anime link
+            this.Animes.Add anime
+        }
 
     member x.ClickCommand with get() = new DelegateCommand(fun () ->  x.onClick() |> Async.StartImmediate)
 
