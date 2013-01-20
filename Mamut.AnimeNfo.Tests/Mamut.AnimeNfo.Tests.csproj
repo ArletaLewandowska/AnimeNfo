@@ -54,7 +54,20 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Mamut.AnimeNfo.Contract\Mamut.AnimeNfo.Contract.fsproj">
+      <Project>{777c5ade-5093-496d-a27b-6bcdde3332b4}</Project>
+      <Name>Mamut.AnimeNfo.Contract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mamut.AnimeNfo.Services\Mamut.AnimeNfo.Services.fsproj">
+      <Project>{2d45cbae-ecf4-4d92-9b23-29e73a27b0c2}</Project>
+      <Name>Mamut.AnimeNfo.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mamut.AnimeNfo.ViewModels\Mamut.AnimeNfo.ViewModels.fsproj">
+      <Project>{5f6f552d-124d-4e15-a421-1a95c620fc13}</Project>
+      <Name>Mamut.AnimeNfo.ViewModels</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Files\AnimeDetailsPage.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

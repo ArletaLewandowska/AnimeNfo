@@ -71,6 +71,34 @@ open System.Text.RegularExpressions
             let simple = page.Replace("&nbsp;", " ").Replace("&copy;", " ")
             regex.Replace(simple, fun (m : Match)-> (m.Groups.[1].Value + "&amp;" + m.Groups.[2].Value))
 
+        let findAnimeDetailsTable (page : string) =
+            let animeDetailsTableRegex = new Regex(@"<table[^>]*class=""anime_info""[^>]*>.+?</table>", RegexOptions.Singleline)
+            animeDetailsTableRegex.Match(page).Value
+
+        let getAnimeDataFromTable animeDetailsTable =
+            let animeDataRegex = new Regex("<td.*?<b>(?<key>.*?)</b>.*?<td.*?>((<a.*?>(?<value>.*?)</a>)|(?<value>.*?))</td>", RegexOptions.Singleline)
+            animeDataRegex.Matches(animeDetailsTable)
+                |> (Seq.cast : MatchCollection -> seq<Match>)
+                |> Seq.map (fun m -> m.Groups.["key"].Value, m.Groups.["value"].Value)
+                |> Map.ofSeq
+
+        let mapAnimeDataToAnime (animeData : Map<string, string>) =
+            let anime = new Mamut.AnimeNfo.Contract.Anime()
+            anime.Title <- animeData.["Title"]
+            anime.JapaneseTitle <- animeData.["Japanese Title"]
+            anime.OfficialSite <- animeData.["Official Site"]
+            anime.Category <- animeData.["Category"]
+            anime.TotalEpisodes <- animeData.["Total Episodes"]
+            anime.Genres <- animeData.["Genres"]
+            anime.YearPublished <- animeData.["Year Published"]
+            anime.ReleaseDate <- animeData.["Release Date"]
+            anime.Broadcaster <- animeData.["Broadcaster"]
+            anime.Studio <- animeData.["Studio"]
+            anime.USDistribution <- animeData.["US Distribution"]
+            anime.UserRating <- animeData.["User Rating"]
+            anime.Updated <- animeData.["Updated"]
+            anime
+            
 open Internal
 
 let yearUrlsFromPage (page : string) =
@@ -105,3 +133,7 @@ let nextUrl (page : string) =
     match nextUrlPath with
     | None -> None
     | Some uq -> Some ("http://www.animenfo.com/" + uq.Attributes().Single().Value)
+
+let animeFromPage (page : string) =
+    findAnimeDetailsTable page |> getAnimeDataFromTable |> mapAnimeDataToAnime
+
