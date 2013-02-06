@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using Mamut.AnimeNfo.Contract;
+using Mamut.AnimeNfo.ViewModels;
 using Microsoft.Practices.Prism.UnityExtensions;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
@@ -22,7 +24,11 @@ namespace AnimeNfo
         {
             base.ConfigureContainer();
 
-            Container.RegisterType<object, AnimeListView>(typeof (AnimeListView).FullName);
+            Container.RegisterType<object, AnimeListView>(typeof (IAnimeListView).FullName);
+            Container.RegisterType<IAnimeListViewModel, AnimeListViewModel>(new ContainerControlledLifetimeManager());
+
+            Container.RegisterType<object, AnimeDetailsView>(typeof (IAnimeDetailsView).FullName);
+            Container.RegisterType<AnimeDetailsViewModel>(new ContainerControlledLifetimeManager());
         }
     }
 }

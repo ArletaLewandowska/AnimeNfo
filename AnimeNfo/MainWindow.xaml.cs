@@ -1,4 +1,4 @@
-﻿using Mamut.AnimeNfo.ViewModels;
+﻿using Mamut.AnimeNfo.Contract;
 using Microsoft.Practices.Prism.Regions;
 
 namespace AnimeNfo
@@ -12,7 +12,7 @@ namespace AnimeNfo
         {
             InitializeComponent();
 
-            Loaded += (sender, args) => regionManager.RequestNavigate("MainRegion", typeof (AnimeListView).FullName);
+            Loaded += (sender, args) => regionManager.RequestNavigate("MainRegion", typeof (IAnimeListView).FullName);
         }
     }
 }
