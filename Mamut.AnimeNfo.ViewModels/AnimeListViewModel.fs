@@ -8,7 +8,7 @@ open Mamut.AnimeNfo.Services.SiteService
 open System.Collections.ObjectModel
 open Mamut.AnimeNfo.Contract
 
-type MainWindowViewModel() = 
+type AnimeListViewModel() = 
     inherit NotificationObject()
 
     let mutable animes = new ObservableCollection<Anime>()

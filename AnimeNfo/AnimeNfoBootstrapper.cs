@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using Microsoft.Practices.Prism.UnityExtensions;
 using Microsoft.Practices.ServiceLocation;
+using Microsoft.Practices.Unity;
 
 namespace AnimeNfo
 {
@@ -21,7 +22,7 @@ namespace AnimeNfo
         {
             base.ConfigureContainer();
 
-            RegisterTypeIfMissing(typeof(MainWindow), typeof(MainWindow), false);
+            Container.RegisterType<object, AnimeListView>(typeof (AnimeListView).FullName);
         }
     }
 }

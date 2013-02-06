@@ -81,7 +81,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainWindowViewModel.fs" />
+    <Compile Include="AnimeListViewModel.fs" />
     <Compile Include="..\Mamut.AnimeNfo.Services\CommonAssemblyInfo.fs">
       <Link>CommonAssemblyInfo.fs</Link>
     </Compile>
