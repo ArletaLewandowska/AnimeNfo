@@ -3,6 +3,7 @@
 open System.Xml.Linq
 open System.Linq
 open System.Text.RegularExpressions
+open Mamut.AnimeNfo.Contract
 
     module private Internal =
 
@@ -82,22 +83,21 @@ open System.Text.RegularExpressions
                 |> Seq.map (fun m -> m.Groups.["key"].Value, m.Groups.["value"].Value)
                 |> Map.ofSeq
 
-        let mapAnimeDataToAnime (animeData : Map<string, string>) =
-            let anime = new Mamut.AnimeNfo.Contract.Anime()
-            anime.Title <- animeData.["Title"]
-            anime.JapaneseTitle <- animeData.["Japanese Title"]
-            anime.OfficialSite <- animeData.["Official Site"]
-            anime.Category <- animeData.["Category"]
-            anime.TotalEpisodes <- animeData.["Total Episodes"]
-            anime.Genres <- animeData.["Genres"]
-            anime.YearPublished <- animeData.["Year Published"]
-            anime.ReleaseDate <- animeData.["Release Date"]
-            anime.Broadcaster <- animeData.["Broadcaster"]
-            anime.Studio <- animeData.["Studio"]
-            anime.USDistribution <- animeData.["US Distribution"]
-            anime.UserRating <- animeData.["User Rating"]
-            anime.Updated <- animeData.["Updated"]
-            anime
+        let mapAnimeDataToAnime (animeData : Map<string, string>) = {  
+            Title = animeData.["Title"];
+            JapaneseTitle = animeData.["Japanese Title"];
+            OfficialSite = animeData.["Official Site"];
+            Category = animeData.["Category"];
+            TotalEpisodes = animeData.["Total Episodes"];
+            Genres = animeData.["Genres"];
+            YearPublished = animeData.["Year Published"];
+            ReleaseDate = animeData.["Release Date"];
+            Broadcaster = animeData.["Broadcaster"];
+            Studio = animeData.["Studio"];
+            USDistribution = animeData.["US Distribution"];
+            UserRating = animeData.["User Rating"];
+            Updated = animeData.["Updated"];
+            }
             
 open Internal
 
