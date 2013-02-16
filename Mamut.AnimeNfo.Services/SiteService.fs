@@ -23,6 +23,7 @@ let yearUrls = async {
     return yearUrlsFromPage page
     }
 
+//todo: make it tail recursive
 let rec animeByYearUrls yearUrl = async {
     let! page = asyncGetHtml yearUrl
     try

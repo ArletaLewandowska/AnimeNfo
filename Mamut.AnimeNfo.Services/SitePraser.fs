@@ -37,9 +37,6 @@ open Mamut.AnimeNfo.Contract
         let findAnimeByYearContainer (doc : XDocument) =
             findDescendantBy isAnimeYearsContainer doc
 
-        let findAnimeUrlsContainer (doc : XDocument) =
-            findDescendantBy isAnimeUrlContainer doc
-
         let ns = XNamespace.Get "http://www.w3.org/1999/xhtml"
         let animeYearsUrls (element : XElement) =
             element
@@ -47,24 +44,6 @@ open Mamut.AnimeNfo.Contract
                 .Element(ns + "small")
                 .Elements()
                 |> Seq.map (fun e -> "http://www.animenfo.com/" + e.Attributes().Single().Value)
-
-        let urlsFromContainer (urlsContainer : XElement) =
-            urlsContainer.Elements()
-            |> Seq.skip 1
-            |> Seq.map
-                (fun e ->
-                    "http://www.animenfo.com/" + e
-                        .Element(ns + "td")
-                        .Element(ns + "a")
-                        .Attributes()
-                        .Single()
-                        .Value)
-
-        let isNextContainer (element : XElement) =
-            let actionAttribute = element.Attribute(XName.op_Implicit "action")
-            element.Name.LocalName = "form"
-            && actionAttribute <> null
-            && actionAttribute.Value = "/animebyyear.php"
 
         let regex = new Regex("(>[^<]*)&([^<]*<)")
 
@@ -79,7 +58,7 @@ open Mamut.AnimeNfo.Contract
         let getAnimeDataFromTable animeDetailsTable =
             let animeDataRegex = new Regex("<td.*?<b>(?<key>.*?)</b>.*?<td.*?>((<a.*?>(?<value>.*?)</a>)|(?<value>.*?))</td>", RegexOptions.Singleline)
             animeDataRegex.Matches(animeDetailsTable)
-                |> (Seq.cast : MatchCollection -> seq<Match>)
+                |> Seq.cast<Match>
                 |> Seq.map (fun m -> m.Groups.["key"].Value, m.Groups.["value"].Value)
                 |> Map.ofSeq
 
@@ -98,6 +77,15 @@ open Mamut.AnimeNfo.Contract
             UserRating = animeData.["User Rating"];
             Updated = animeData.["Updated"];
             }
+
+        let findAnimeUrlsTable page =
+            let animeUrlsTableRegex = new Regex(@"<table[^>]*class=""anime_info""[^>]*>.+?</table>", RegexOptions.Singleline)
+            animeUrlsTableRegex.Match(page).Value
+
+        let getUrlsDataFromTable table =
+            (new Regex(@"href=""(?<url>.+?)""")).Matches(table)
+            |> Seq.cast<Match>
+            |> Seq.map (fun m -> "http://www.animenfo.com/" + m.Groups.["url"].Value)
             
 open Internal
 
@@ -108,31 +96,19 @@ let yearUrlsFromPage (page : string) =
         |> findAnimeByYearContainer 
     animeYearsUrls (container.Value)
 
-let urlsFromPage (page : string) =
-    let urlsContainer =
-        normalizePage page
-        |> XDocument.Parse
-        |> findAnimeUrlsContainer
-    urlsFromContainer urlsContainer.Value
+let urlsFromPage page =
+    findAnimeUrlsTable page |> getUrlsDataFromTable
 
-let nextUrl (page : string) =
-    let nextContaner =
-        normalizePage page
-        |> XDocument.Parse
-        |> findDescendantBy isNextContainer
+let nextUrl page =
+    let nextContainer =
+        (new Regex(@"<form[^>]*action='/animebyyear.php'[^>]*>.+?</form>", RegexOptions.Singleline)).Match(page).Value
 
     let nextUrlPath = 
-        nextContaner.Value
-            .Element(ns + "div")
-            .Element(ns + "table")
-            .Element(ns + "tr")
-            .Element(ns + "td")
-            .Elements(ns + "a")
-        |> Seq.tryFind (fun e -> e.Value = "Next")
-
-    match nextUrlPath with
-    | None -> None
-    | Some uq -> Some ("http://www.animenfo.com/" + uq.Attributes().Single().Value)
+        (new Regex(@"<a[^>]*?href='(?<value>[^']+)'[^>]*>Next</a>", RegexOptions.Singleline)).Match(nextContainer)
+    
+    if (nextUrlPath.Success)
+        then Some("http://www.animenfo.com" + nextUrlPath.Groups.["value"].Value.Replace("&amp;", "&"))
+    else None
 
 let animeFromPage (page : string) =
     findAnimeDetailsTable page |> getAnimeDataFromTable |> mapAnimeDataToAnime
