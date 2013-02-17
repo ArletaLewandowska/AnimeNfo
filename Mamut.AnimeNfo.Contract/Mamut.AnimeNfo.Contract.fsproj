@@ -36,9 +36,12 @@
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')" />
   <ItemGroup>
-    <Compile Include="Anime.fs" />
     <Compile Include="IAnimeListView.fs" />
     <Compile Include="IAnimeDetailsView.fs" />
+    <Compile Include="AnimeCategory.fs" />
+    <Compile Include="Rating.fs" />
+    <Compile Include="Genre.fs" />
+    <Compile Include="Anime.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

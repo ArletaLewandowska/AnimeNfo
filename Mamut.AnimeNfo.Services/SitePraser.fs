@@ -1,5 +1,7 @@
 ﻿module Mamut.AnimeNfo.Services.SitePraser
 
+open System
+open System.Globalization
 open System.Xml.Linq
 open System.Linq
 open System.Text.RegularExpressions
@@ -62,20 +64,51 @@ open Mamut.AnimeNfo.Contract
                 |> Seq.map (fun m -> m.Groups.["key"].Value, m.Groups.["value"].Value)
                 |> Map.ofSeq
 
+        let userRatingRegex = new Regex(@"(?<rating>\d\.\d).+?\((?<reviewCount>\d+)")
+        let genresRegex = new Regex("<a href.+?>(?<genre>.+?)</a>")
+        let linkUrlRegex = new Regex(@"href=""(?<url>.+?)""[^>]*>\s*(?<text>.+?)<", RegexOptions.Singleline)
+        let getLinkUrl link = linkUrlRegex.Match(link).Groups.["url"].Value
+        let getLinkText link = linkUrlRegex.Match(link).Groups.["text"].Value
+
         let mapAnimeDataToAnime (animeData : Map<string, string>) = {  
             Title = animeData.["Title"];
             JapaneseTitle = animeData.["Japanese Title"];
             OfficialSite = animeData.["Official Site"];
-            Category = animeData.["Category"];
+            Category =
+                match animeData.["Category"] with
+                | "OVA" -> Some OVA
+                | "TV" -> Some TV
+                | "Movie" -> Some Movie
+                | "Internet" -> Some Internet
+                | "Special" -> Some Special
+                | "OAD" -> Some OAD
+                | "Mobile Phone" -> Some MobilePhone
+                | "-" -> None
+                | t -> failwithf "Unknown type: '%s'" t;
             TotalEpisodes = animeData.["Total Episodes"];
-            Genres = animeData.["Genres"];
-            YearPublished = animeData.["Year Published"];
-            ReleaseDate = animeData.["Release Date"];
+            Genres =
+                genresRegex.Matches animeData.["Genres"]
+                |> Seq.cast<Match>
+                |> Seq.map (fun m -> Genre.Parse m.Groups.["genre"].Value )
+                |> List.ofSeq
+            YearPublished = Int32.Parse(animeData.["Year Published"]);
+            ReleaseDate =
+                match DateTime.TryParseExact(animeData.["Release Date"], "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None) with
+                | (true, result) -> Some result
+                | _ -> None;
             Broadcaster = animeData.["Broadcaster"];
-            Studio = animeData.["Studio"];
-            USDistribution = animeData.["US Distribution"];
-            UserRating = animeData.["User Rating"];
-            Updated = animeData.["Updated"];
+            Studio = getLinkText animeData.["Studio"];
+            USDistribution = getLinkText animeData.["US Distribution"];
+            UserRating =
+                match animeData.["User Rating"] with
+                | "N/A" -> None
+                | ur -> 
+                    let m = userRatingRegex.Match animeData.["User Rating"]
+                    Some {
+                        Value = Decimal.Parse(m.Groups.["rating"].Value, CultureInfo.InvariantCulture);
+                        ReviewCount = Int32.Parse(m.Groups.["reviewCount"].Value);
+                    }
+            Updated = Convert.ToDateTime animeData.["Updated"];
             }
 
         let findAnimeUrlsTable page =
@@ -83,7 +116,7 @@ open Mamut.AnimeNfo.Contract
             animeUrlsTableRegex.Match(page).Value
 
         let getUrlsDataFromTable table =
-            (new Regex(@"href=""(?<url>.+?)""")).Matches(table)
+            linkUrlRegex.Matches(table)
             |> Seq.cast<Match>
             |> Seq.map (fun m -> "http://www.animenfo.com/" + m.Groups.["url"].Value)
             

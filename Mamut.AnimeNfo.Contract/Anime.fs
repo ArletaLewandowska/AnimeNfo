@@ -1,17 +1,19 @@
 ﻿namespace Mamut.AnimeNfo.Contract
 
+open System
+
 type Anime = {
     Title : string;
     JapaneseTitle : string;
     OfficialSite : string;
-    Category : string;
+    Category : AnimeCategory option;
     TotalEpisodes : string;
-    Genres : string;
-    YearPublished : string;
-    ReleaseDate : string;
+    Genres : Genre list;
+    YearPublished : int;
+    ReleaseDate : DateTime option;
     Broadcaster : string;
     Studio : string;
     USDistribution : string;
-    UserRating : string;
-    Updated :  string;
+    UserRating : Rating option;
+    Updated :  DateTime;
     }
